@@ -12,13 +12,11 @@ const App = () => {
   const [from, setFrom] = useState(new Date());
   const [to, setTo] = useState(new Date());
 
-  const [openFrom, setOpenFrom] = useState(false);
-  const handleOpenFrom = () => setOpenFrom(true);
-  const handleCloseFrom = () => setOpenFrom(false);
+  const [toggleModalFrom, setToggleModalFrom] = useState(false);
+  const handlerModalFrom = () => setToggleModalFrom(!toggleModalFrom);
 
-  const [openTo, setOpenTo] = useState(false);
-  const handleOpenTo = () => setOpenTo(true);
-  const handleCloseTo = () => setOpenTo(false);
+  const [toggleModalTo, setToggleModalTo] = useState(false);
+  const handlerModalTo = () => setToggleModalTo(!toggleModalTo);
 
   const style = {
     position: 'absolute',
@@ -33,12 +31,15 @@ const App = () => {
   };
 
   const getCasesFromTo: any = async (from: any, to: any) => {
-    const { data } = await axios('https://api.covid19api.com/country/belgium/status/confirmed', {
-      params: {
-        from: from.toISOString(),
-        to: to.toISOString(),
-      },
-    });
+    const { data } = await axios(
+      'https://api.covid19api.com/country/belgium/status/confirmed',
+      {
+        params: {
+          from: from.toISOString(),
+          to: to.toISOString(),
+        },
+      }
+    );
 
     setCovidCases(data);
   };
@@ -51,8 +52,8 @@ const App = () => {
     <div>
       <h2>
         Select the date <span style={{ color: 'violet' }}>FROM</span> and
-        <span style={{ color: 'violet', marginBottom: '50px' }}> TO</span> to see the number of
-        diseases on Covid
+        <span style={{ color: 'violet', marginBottom: '50px' }}> TO</span> to
+        see the number of diseases on Covid
       </h2>
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         <Box
@@ -63,7 +64,10 @@ const App = () => {
             justifyContent: 'center',
             marginRight: '30px',
           }}>
-          <Button variant='contained' onClick={handleOpenFrom} sx={{ width: '100px' }}>
+          <Button
+            variant='contained'
+            onClick={handlerModalFrom}
+            sx={{ width: '100px' }}>
             from
           </Button>
           <p>{from.toLocaleDateString()}</p>
@@ -76,7 +80,10 @@ const App = () => {
             justifyContent: 'center',
             marginRight: '30px',
           }}>
-          <Button variant='contained' onClick={handleOpenTo} sx={{ width: '100px' }}>
+          <Button
+            variant='contained'
+            onClick={handlerModalTo}
+            sx={{ width: '100px' }}>
             to
           </Button>
           <p>{to.toLocaleDateString()}</p>
@@ -90,26 +97,26 @@ const App = () => {
         </Button>
       </Box>
       <Modal
-        open={openFrom}
-        onClose={handleCloseFrom}
+        open={toggleModalFrom}
+        onClose={handlerModalFrom}
         aria-labelledby='modal-modal-title'
         aria-describedby='modal-modal-description'>
         <Box sx={style}>
           <Calendar onChange={setFrom} value={from} />
-          <Button sx={{ marginTop: '20px' }} onClick={handleCloseFrom}>
+          <Button sx={{ marginTop: '20px' }} onClick={handlerModalFrom}>
             Close
           </Button>
         </Box>
       </Modal>
 
       <Modal
-        open={openTo}
-        onClose={handleCloseTo}
+        open={toggleModalTo}
+        onClose={handlerModalTo}
         aria-labelledby='modal-modal-title'
         aria-describedby='modal-modal-description'>
         <Box sx={style}>
           <Calendar onChange={setTo} value={to} />
-          <Button sx={{ marginTop: '20px' }} onClick={handleCloseTo}>
+          <Button sx={{ marginTop: '20px' }} onClick={handlerModalTo}>
             Close
           </Button>
         </Box>
