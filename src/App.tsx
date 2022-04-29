@@ -1,128 +1,70 @@
 import React from 'react';
-import axios from 'axios';
 import './App.css';
 import { useEffect, useState } from 'react';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import { Box, Modal, Button } from '@mui/material';
 import ListCases from './Components/ListCases';
+import DatePicker from './Components/DatePicker';
+import useModal from './Components/Modal';
+import { ButtonContainer, MainContainer, Btn } from './AppStyle';
+import Heading from './Components/Heading';
+import { getCasesFromTo } from './services/api';
 
 const App = () => {
   const [covidCases, setCovidCases] = useState([]);
-  const [from, setFrom] = useState(new Date());
-  const [to, setTo] = useState(new Date());
+  const [from, setFrom] = React.useState<Date | null>(new Date());
+  const [to, setTo] = React.useState<Date | null>(new Date());
+  const [currentModal, setCurrentModal] = useState('from');
 
-  const [toggleModalFrom, setToggleModalFrom] = useState(false);
-  const handlerModalFrom = () => setToggleModalFrom(!toggleModalFrom);
+  const { toggleModal, isModalOpen } = useModal();
 
-  const [toggleModalTo, setToggleModalTo] = useState(false);
-  const handlerModalTo = () => setToggleModalTo(!toggleModalTo);
-
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 300,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
+  const handleDateFrom = (newValue: Date | null) => {
+    setFrom(newValue);
   };
 
-  const getCasesFromTo: any = async (from: any, to: any) => {
-    const { data } = await axios(
-      'https://api.covid19api.com/country/belgium/status/confirmed',
-      {
-        params: {
-          from: from.toISOString(),
-          to: to.toISOString(),
-        },
-      }
-    );
-
-    setCovidCases(data);
+  const handleDateTo = (newValue: Date | null) => {
+    setTo(newValue);
   };
 
+  const cases: any = async (from: Date | null, to: Date | null) => {
+    setCovidCases(await getCasesFromTo(from, to));
+  };
   useEffect(() => {
-    getCasesFromTo(from, to);
-  }, []);
+    cases(from, to);
+  }, [from, to]);
 
   return (
     <div>
-      <h2>
-        Select the date <span style={{ color: 'violet' }}>FROM</span> and
-        <span style={{ color: 'violet', marginBottom: '50px' }}> TO</span> to
-        see the number of diseases on Covid
-      </h2>
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: '30px',
-          }}>
-          <Button
+      <Heading />
+      <MainContainer>
+        <ButtonContainer>
+          <Btn
             variant='contained'
-            onClick={handlerModalFrom}
-            sx={{ width: '100px' }}>
+            onClick={() => {
+              setCurrentModal('from');
+              toggleModal();
+            }}
+            sx={{}}>
             from
-          </Button>
-          <p>{from.toLocaleDateString()}</p>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: '30px',
-          }}>
-          <Button
+          </Btn>
+          <p>{from?.toLocaleDateString()}</p>
+        </ButtonContainer>
+        <ButtonContainer>
+          <Btn
             variant='contained'
-            onClick={handlerModalTo}
-            sx={{ width: '100px' }}>
+            onClick={() => {
+              setCurrentModal('to');
+              toggleModal();
+            }}>
             to
-          </Button>
-          <p>{to.toLocaleDateString()}</p>
-        </Box>
-        <Button
-          onClick={() => getCasesFromTo(from, to)}
-          variant='contained'
-          color='success'
-          sx={{ width: '100px', height: '36.7px' }}>
-          Search
-        </Button>
-      </Box>
-      <Modal
-        open={toggleModalFrom}
-        onClose={handlerModalFrom}
-        aria-labelledby='modal-modal-title'
-        aria-describedby='modal-modal-description'>
-        <Box sx={style}>
-          <Calendar onChange={setFrom} value={from} />
-          <Button sx={{ marginTop: '20px' }} onClick={handlerModalFrom}>
-            Close
-          </Button>
-        </Box>
-      </Modal>
-
-      <Modal
-        open={toggleModalTo}
-        onClose={handlerModalTo}
-        aria-labelledby='modal-modal-title'
-        aria-describedby='modal-modal-description'>
-        <Box sx={style}>
-          <Calendar onChange={setTo} value={to} />
-          <Button sx={{ marginTop: '20px' }} onClick={handlerModalTo}>
-            Close
-          </Button>
-        </Box>
-      </Modal>
-
-      <ListCases cases={covidCases} />
+          </Btn>
+          <p>{to?.toLocaleDateString()}</p>
+        </ButtonContainer>
+      </MainContainer>
+      <DatePicker
+        date={currentModal === 'from' ? from : to}
+        onDateChange={currentModal === 'from' ? handleDateFrom : handleDateTo}
+        isModal={isModalOpen}
+        toggleModal={toggleModal}></DatePicker>
+      <ListCases covidCases={covidCases} />
     </div>
   );
 };

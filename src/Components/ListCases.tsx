@@ -1,10 +1,14 @@
 import React from 'react';
 
-const ListCases = (props: any) => {
-  const { cases } = props;
+interface Props {
+  covidCases: Array<{
+    Cases: number;
+  }>;
+}
 
-  const from = cases[0]?.Cases;
-  const to = cases[cases.length - 1]?.Cases;
+const ListCases: React.FC<Props> = ({ covidCases }) => {
+  const from = covidCases[0]?.Cases;
+  const to = covidCases[covidCases.length - 1]?.Cases;
 
   return (
     <div>
