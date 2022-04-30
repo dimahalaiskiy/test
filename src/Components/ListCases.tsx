@@ -1,4 +1,5 @@
 import React from 'react';
+import { TextCases } from '../AppStyle';
 
 interface Props {
   covidCases: Array<{
@@ -11,9 +12,10 @@ const ListCases: React.FC<Props> = ({ covidCases }) => {
   const to = covidCases[covidCases.length - 1]?.Cases;
 
   return (
-    <div>
-      <p> {from && to && to - from} number of infected </p>
-    </div>
+    <TextCases>
+      <span style={{ color: 'red' }}>{from && to && to - from}</span> number of
+      infected
+    </TextCases>
   );
 };
 

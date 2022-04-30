@@ -1,15 +1,26 @@
 import axios from 'axios';
 
-export const getCasesFromTo = async (from: Date | null, to: Date | null) => {
+interface DateInterface {
+  from: Date | null;
+  to: Date | null;
+}
+
+export const getCasesFromTo = async (date: DateInterface, country: string) => {
   const { data } = await axios(
-    'https://api.covid19api.com/country/belgium/status/confirmed',
+    `https://api.covid19api.com/country/${country}/status/confirmed`,
     {
       params: {
-        from: from?.toISOString(),
-        to: to?.toISOString(),
+        from: date.from?.toISOString(),
+        to: date.to?.toISOString(),
       },
     }
   );
+
+  return data;
+};
+
+export const getCountries = async () => {
+  const { data } = await axios('https://api.covid19api.com/countries');
 
   return data;
 };

@@ -7,29 +7,57 @@ import useModal from './Components/Modal';
 import { ButtonContainer, MainContainer, Btn } from './AppStyle';
 import Heading from './Components/Heading';
 import { getCasesFromTo } from './services/api';
+import SelectCountry from './Components/SelectCountry';
 
 const App = () => {
+  interface DateInterface {
+    from: Date | null;
+    to: Date | null;
+  }
+
+  const currentDate: Date = new Date();
+  const getCurrentMaxDate = currentDate.setDate(currentDate.getDate() - 1);
+
+  const [currentCountry, setCurrentCountry] = useState('belgium');
   const [covidCases, setCovidCases] = useState([]);
-  const [from, setFrom] = React.useState<Date | null>(new Date());
-  const [to, setTo] = React.useState<Date | null>(new Date());
-  const [currentModal, setCurrentModal] = useState('from');
+  const [currentDatePicker, setCurrentDatePicker] = useState('from');
+  const [date, setDate] = useState<DateInterface>({
+    from: new Date(getCurrentMaxDate),
+    to: new Date(getCurrentMaxDate),
+  });
+
+  const [dateFrom, setDateFrom] = useState<Date | null>(
+    new Date(getCurrentMaxDate)
+  );
+  const [dateTo, setDateTo] = useState<Date | null>(
+    new Date(getCurrentMaxDate)
+  );
 
   const { toggleModal, isModalOpen } = useModal();
 
+  const getCurrentCountry = (country: string) => {
+    setCurrentCountry(country);
+  };
+
+  const confirmDate = () => {
+    setDate({ from: dateFrom, to: dateTo });
+  };
+
   const handleDateFrom = (newValue: Date | null) => {
-    setFrom(newValue);
+    setDateFrom(newValue);
   };
 
   const handleDateTo = (newValue: Date | null) => {
-    setTo(newValue);
+    setDateTo(newValue);
   };
 
-  const cases: any = async (from: Date | null, to: Date | null) => {
-    setCovidCases(await getCasesFromTo(from, to));
+  const getCovidCases = async (date: DateInterface, country: string) => {
+    setCovidCases(await getCasesFromTo(date, country));
   };
+
   useEffect(() => {
-    cases(from, to);
-  }, [from, to]);
+    getCovidCases(date, currentCountry);
+  }, [date, currentCountry]);
 
   return (
     <div>
@@ -39,31 +67,36 @@ const App = () => {
           <Btn
             variant='contained'
             onClick={() => {
-              setCurrentModal('from');
+              setCurrentDatePicker('from');
               toggleModal();
-            }}
-            sx={{}}>
+            }}>
             from
           </Btn>
-          <p>{from?.toLocaleDateString()}</p>
+          <p>{date.from?.toLocaleDateString()}</p>
         </ButtonContainer>
         <ButtonContainer>
           <Btn
             variant='contained'
             onClick={() => {
-              setCurrentModal('to');
+              setCurrentDatePicker('to');
               toggleModal();
             }}>
             to
           </Btn>
-          <p>{to?.toLocaleDateString()}</p>
+          <p>{date.to?.toLocaleDateString()}</p>
         </ButtonContainer>
+        <SelectCountry getCurrentCountry={getCurrentCountry} />
       </MainContainer>
       <DatePicker
-        date={currentModal === 'from' ? from : to}
-        onDateChange={currentModal === 'from' ? handleDateFrom : handleDateTo}
+        confirmDate={confirmDate}
+        value={currentDatePicker}
+        date={currentDatePicker === 'from' ? dateFrom : dateTo}
+        onDateChange={
+          currentDatePicker === 'from' ? handleDateFrom : handleDateTo
+        }
         isModal={isModalOpen}
-        toggleModal={toggleModal}></DatePicker>
+        toggleModal={toggleModal}
+        getCurrentMaxDate={getCurrentMaxDate}></DatePicker>
       <ListCases covidCases={covidCases} />
     </div>
   );

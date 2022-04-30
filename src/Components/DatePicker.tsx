@@ -10,6 +10,9 @@ interface Props {
   onDateChange: (newValue: Date | null) => void;
   isModal: boolean;
   toggleModal: () => void;
+  value: string;
+  getCurrentMaxDate: number;
+  confirmDate: () => void;
 }
 
 const DatePicker: React.FC<Props> = ({
@@ -17,8 +20,12 @@ const DatePicker: React.FC<Props> = ({
   onDateChange,
   isModal,
   toggleModal,
+  value,
+  getCurrentMaxDate,
+  confirmDate,
 }) => {
-  const { closeModal, style } = useModal();
+  const { style } = useModal();
+
   return (
     <div>
       <Modal open={isModal} onClose={toggleModal}>
@@ -27,7 +34,9 @@ const DatePicker: React.FC<Props> = ({
             sx={{ marginBottom: '30px' }}
             dateAdapter={AdapterDateFns}>
             <DesktopDatePicker
-              label='Date desktop'
+              minDate={new Date(2020, 1, 22)}
+              maxDate={new Date(getCurrentMaxDate)}
+              label={value === 'from' ? 'Date From' : 'Date To'}
               inputFormat='MM/dd/yyyy'
               value={date}
               onChange={onDateChange}
@@ -37,10 +46,16 @@ const DatePicker: React.FC<Props> = ({
           <Button
             sx={{ margin: '30px 20px 0 0' }}
             color='success'
-            onClick={closeModal}>
+            onClick={() => {
+              confirmDate();
+              toggleModal();
+            }}>
             Сonfirm
           </Button>
-          <Button sx={{ marginTop: '30px' }} color='error' onClick={closeModal}>
+          <Button
+            sx={{ marginTop: '30px' }}
+            color='error'
+            onClick={toggleModal}>
             Cancel
           </Button>
         </Box>
