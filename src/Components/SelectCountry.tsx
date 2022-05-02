@@ -7,6 +7,14 @@ interface Props {
   getCurrentCountry: (country: string) => void;
 }
 
+interface firsCountry {
+  Country: string;
+}
+
+interface secondCountry {
+  Country: string;
+}
+
 const SelectCountry: React.FC<Props> = ({ getCurrentCountry }) => {
   const [countries, setCountries] = useState<
     Array<{ Country: string; ISO2: string; Slug: string }>
@@ -15,8 +23,9 @@ const SelectCountry: React.FC<Props> = ({ getCurrentCountry }) => {
 
   const sortedCountryByName =
     countries?.length > 1
-      ? [...countries].sort((firstCountry: any, secondCountry: any) =>
-          firstCountry.Country.localeCompare(secondCountry.Country)
+      ? [...countries].sort(
+          (firstCountry: firsCountry, secondCountry: secondCountry) =>
+            firstCountry.Country.localeCompare(secondCountry.Country)
         )
       : countries;
 
